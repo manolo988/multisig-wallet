@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function NewTransfer(createTransfer) {
+function NewTransfer({createTransfer}) {
     const [transfer, setTransfer] = useState(undefined);
     const submit = e => {
         e.preventDefault();

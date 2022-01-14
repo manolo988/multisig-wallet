@@ -4,17 +4,18 @@ import Header from './Header.js';
 import NewTransfer from "./NewTransfer";
 import TransferList from "./TransferList";
 
+
 function App() {
   const [web3, setWeb3] = useState(undefined);
   const [accounts, setAccounts] = useState(undefined);
   const [wallet, setWallet] = useState(undefined);
   const [approvers, setApprovers] = useState([]);
   const [quorum, setQuorum] = useState(undefined);
-  const [transfers, setTransfers] = useState(undefined);
+  const [transfers, setTransfers] = useState([]);
 
   useEffect(() => {
     const init = async () => {
-      const web3 = getWeb3();
+      const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
       const wallet = await getWallet(web3);
       const approvers = await wallet.methods.getApprovers().call();
@@ -33,7 +34,13 @@ function App() {
   const createTransfer = transfer => {
     wallet.methods
         .createTransfer(transfer.amount, transfer.to)
-        .send();
+        .send({from:accounts[0]});
+  }
+
+  const approveTransfer = transferId => {
+    wallet.methods
+        .approveTransfer(transferId)
+        .send({from: accounts[0]});
   }
 
   if(
@@ -50,8 +57,8 @@ function App() {
       <div>
         Multisig Dapp
         <Header approvers={approvers} quorum={quorum} />
-        <NewTransfer createTransfer={{createTransfer}}/>
-        <TransferList transfers={transfers}/>
+        <NewTransfer createTransfer={createTransfer} />
+        <TransferList transfers={transfers} approveTransfer={approveTransfer}/>
       </div>
   );
 }
